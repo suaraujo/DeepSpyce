@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 records = 0
 
-with open("datos/20201027_133329_0.raw","rb") as f:
+with open("../datos/20201027_133329_data.raw","rb") as f:
     fecha, hora, resto = f.name.split('_')
     print(fecha,hora)
     dt = np.dtype('d')
