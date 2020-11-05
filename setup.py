@@ -34,7 +34,7 @@ from setuptools import setup
 # =============================================================================
 
 REQUIREMENTS = ["numpy", "pandas"]
- 
+
 PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 
 with open(PATH / "README.md") as fp:
