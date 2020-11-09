@@ -1,20 +1,20 @@
 import os
 import numpy as np
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import pandas as pd
 #import statistics as st
 
 #records = 0
 #medias = []
 #deltas = []
-
-fd = open("../raw_data/20201027_133329_1m.raw", "rb") 
+fc = 1420.0
+bw = 100.0
+freq = np.linspace(fc - bw/2.0, fc + bw/2.0, num=2048)
 
 def raw2df(raw):
     '''
     Funcion para convertir datos RAW a DataFrame
     '''
-
     spch = 2048
     bspl = 8
     size = os.path.getsize(raw.name)
@@ -28,9 +28,42 @@ def raw2df(raw):
     df = pd.DataFrame(np_data)
     return df
 
+def spprom(raw):
+    '''
+    Promedia los espectros del DataFrame y grafica
+    '''
+    spprom = raw.mean(axis=1)
+    plt.plot(freq,spprom)
+    plt.yscale('log')
+    plt.title('Espectro promediado de todo el archivo')
+    plt.xlabel('Frecuencia [MHz]')
+    plt.ylabel('Amplitud [cuentas]')
+    plt.show()
+
+def read_mdata(mdata):
+    '''
+    Leer archivos metadata con datos de la observacion
+    '''
+    pass
+
+def df2fb(dframe):
+    '''
+    Convertir DataFrame a Filterbank
+    '''
+    pass
+
 if __name__ == "__main__":
+    fd = open("../raw_data/20201027_133329_1m.raw", "rb")
     data = raw2df(fd)
     print(data[0])
+    spprom(data)
+    fd.close()
+#    spprom = data.mean(axis=1)
+#    print(len(spprom))
+#    print(spprom[0])
+#    plt.plot(spprom)
+#    plt.yscale('log')
+#    plt.show()
 
 
 #with open("../../dirtest/20201027_133329_0.raw", "rb") as fd:
