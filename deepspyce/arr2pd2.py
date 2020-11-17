@@ -2051,7 +2051,7 @@ ar_test = np.array([
 [923258,932865],
 [1101713,1102830],
 [0,0]
-])
+],)
 
 
 df_test = pd.DataFrame(ar_test)
@@ -2064,5 +2064,8 @@ df_comp = raw2df(fd)
 
 print(df_comp)
 
-print(df_test.equals(df_comp))
+#pd.testing.assert_frame_equal(df_test,df_comp)
 
+print('son iguales?: ',df_test.equals(df_comp))
+#print(df_test.dtypes)
+#print(df_comp.dtypes)
