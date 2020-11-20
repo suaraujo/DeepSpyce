@@ -33,7 +33,7 @@ from setuptools import setup
 # CONSTANTS
 # =============================================================================
 
-REQUIREMENTS = ["numpy", "pandas"]
+REQUIREMENTS = ["numpy", "pandas", "os"]
 
 PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 

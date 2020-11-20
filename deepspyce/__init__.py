@@ -25,4 +25,4 @@ __version__ = "0.0.1"
 # IMPORTS
 # =============================================================================
 
-from .read_raw import *  # noqa
+from .read_raw_f import *  # noqa
