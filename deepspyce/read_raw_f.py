@@ -1,5 +1,3 @@
-import os
-
 import numpy as np
 
 import pandas as pd
@@ -20,11 +18,12 @@ def raw2df(raw):
     """
     spch = 2048
     bspl = 8
-    size = os.path.getsize(raw.name)
+    data = raw.read()
+    size = raw.tell()
     nrec = int(size / spch / bspl)
     dt = np.dtype("q")
     dt = dt.newbyteorder(">")
-    data = raw.read()
+
     np_data = np.frombuffer(data, dtype=dt)
     np_data = np.int64(np_data)
     np_data.resize(nrec, spch)

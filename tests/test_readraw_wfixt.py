@@ -6,6 +6,8 @@ import pandas as pd
 
 import struct as stc
 
+import io
+
 import deepspyce as dspy
 
 
@@ -28,8 +30,17 @@ def data_raw(data_df):
     return raw_df0
 
 
-def test_read(data_df, data_raw):
-    df1 = dspy.raw2df(data_raw)
-    df0 = data_df
+@pytest.fixture
+def data_file(data_raw):
+    fd = io.BytesIO()
+    fd.write(data_raw)
 
-    assert df0 == df1
+    return fd
+
+
+def test_read(data_df, data_raw, data_file):
+    df1 = dspy.raw2df(data_file)
+    # df0 = data_df
+    df0 = data_df.transpose()
+
+    assert pd.testing.assert_frame_equal(df1, df0)
