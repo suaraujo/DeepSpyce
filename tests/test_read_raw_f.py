@@ -1,7 +1,8 @@
-import pytest
 import numpy as np
+
 import pandas as pd
-from read_raw_f import raw2df
+
+from deepspyce import raw2df
 
 
 def test_raw2df():
@@ -2058,6 +2059,6 @@ def test_raw2df():
         ],
     )
     df_test = pd.DataFrame(ar_test)
-    fd = open("../raw_data/20201027_133329_test.raw", "rb")
+    fd = open("./raw_data/20201027_133329_test.raw", "rb")
     df_comp = raw2df(fd)
     assert df_test.equals(df_comp) is True
