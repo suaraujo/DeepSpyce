@@ -1,15 +1,30 @@
 import numpy as np
-
 import pandas as pd
+import struct as stc
+import io
 
-# records = 0
-# medias = []
-# deltas = []
-fc = 1420.0
-bw = 100.0
-freq = np.linspace(fc - bw / 2.0, fc + bw / 2.0, num=2048)
+np.random.seed(42)
+df=pd.DataFrame(np.random.randint(0, 100000, size=(1, 2048)))
+print(df.transpose())
 
-path = input("Please, enter your raw data path: ")
+# este seria la parte del data_raw
+a=df.to_numpy(dtype='float64')
+#print(a.dtype)
+
+a=a.flatten()
+
+#print(a.dtype)
+#print(a)
+cant=len(a)
+
+
+raw3 = stc.pack('d'*cant,*a)
+
+#aca con el que pasa el file
+
+fd1= io.BytesIO()
+fd1.write(raw3)
+
 
 
 def raw2df(raw):
@@ -34,8 +49,10 @@ def raw2df(raw):
 
 
 if __name__ == "__main__":
-    fd = open(path, "rb")
-    data = raw2df(fd)
+    #fd = open(' ', "rb")
+    data = raw2df(fd1)
+    print(data)
     # data.to_csv("test.csv")
-    fd.close()
+    #fd.close()
 # This is the end
+

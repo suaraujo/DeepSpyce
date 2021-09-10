@@ -64,7 +64,9 @@ def do_setup():
 
         author=[
             "Susana Beatriz Araujo Furlan",
-            "Marcelo Colazo"],
+            "Marcelo Colazo",
+            "Emmanuel Gianuzzi",
+            "Gabriel Oio"],
         author_email="saraujo@iar.unlp.edu.ar",
         url="https://github.com/suaraujo/DeepSpyce",
         license="MIT",
