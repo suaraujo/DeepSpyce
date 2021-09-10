@@ -2059,6 +2059,7 @@ def test_raw2df():
         ],
     )
     df_test = pd.DataFrame(ar_test)
-    fd = open("./raw_data/20201027_133329_test.raw", "rb")
-    df_comp = raw2df(fd)
-    assert df_test.equals(df_comp) is True
+    with open("./raw_data/20201027_133329_test.raw", "rb") as fd:
+        df_comp = raw2df(fd)
+
+    pd.testing.assert_frame_equal(df_test, df_comp)
