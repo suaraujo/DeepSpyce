@@ -18,6 +18,7 @@ def raw2df(raw):
     """
     spch = 2048
     bspl = 8
+    raw.seek(0)
     data = raw.read()
     size = raw.tell()
     nrec = int(size / spch / bspl)
