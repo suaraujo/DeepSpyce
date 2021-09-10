@@ -1,33 +1,30 @@
-import pytest
+import io
 
 import numpy as np
 
 import pandas as pd
 
-import struct as stc
-
-import io
+import pytest
 
 import deepspyce as dspy
-
 
 # =============================================================================
 # FIXTURES
 # =============================================================================
 
 @pytest.fixture
-def data_df():
+def data_df() -> pd.DataFrame:
     np.random.seed(42)
-    dt = np.dtype("q")
-    df0 = pd.DataFrame(np.random.randint(0, 100000, size=(5, 2048), dtype = dt))
-    #randint es int 32 ._. 
+    dt = np.dtype("q") # 8 bytes
+    df0 = pd.DataFrame(np.random.randint(0, 100000, size=(5, 2048), dtype=dt))
+    #Con dt nos aseguramos que son int64 
     return df0
 
 
 @pytest.fixture
-def data_raw(data_df):
+def data_raw(data_df : pd.DataFrame) -> bytes:
 
-    df_np0 = data_df.to_numpy(dtype='>q')
+    df_np0 = np.array(data_df, dtype='>q')
     df_np1 = df_np0.flatten()
     #n_elem = len(df_np1)
 
@@ -40,7 +37,7 @@ def data_raw(data_df):
 
 
 @pytest.fixture
-def data_file(data_raw):
+def data_file(data_raw : bytes):
     fd = io.BytesIO(data_raw) #poner el data en el constructuor xq sino desp hay que usar un seek(0)
     #fd.write()
 
@@ -50,22 +47,27 @@ def data_file(data_raw):
 # TESTS
 # =============================================================================
 
-def test_read(data_df, data_raw, data_file):
-    df1 = dspy.raw2df(data_file)
-    # df0 = data_df
-    
-    df0 = data_df.transpose()
+def test_read(
+    data_df : pd.DataFrame,
+    data_raw : callable,
+    data_file : callable,
+    ):
+
+    df1 = dspy.raw2df(data_file(data_raw(data_df)))
+    df0 = data_df.transpose() # verificar trasposición
 
     pd.testing.assert_frame_equal(df1, df0)
 
-
-def test_estad(data_df, data_file):
-    df1 = dspy.raw2df(data_file)
+def test_estad(
+    data_df : pd.DataFrame,
+    data_raw : callable,
+    data_file : callable,
+    ):
+    df1 = dspy.raw2df(data_file(data_raw(data_df)))
     
-    df0 = data_df.transpose()
+    df0 = data_df.transpose() # verificar trasposición
     
-
     a = df1.describe()
     b = df0.describe()
 
-    assert_series_equal(a,b)
+    pd.testing.assert_series_equal(a,b)
