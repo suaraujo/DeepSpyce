@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 
 import pytest
-from _pytest.fixtures import fixture
 
 import deepspyce as dspy
 
