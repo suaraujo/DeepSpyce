@@ -7,9 +7,9 @@ from astropy.io import fits
 
 def raw2df(
     raw: io.BufferedReader,
-    dtype: np.dtype = int,
     n_channels: int = 2048,
     bpcps: int = 8,
+    dtype: np.dtype = int,
 ) -> pd.DataFrame:
     """
     Función para convertir datos RAW a DataFrame.
@@ -25,7 +25,7 @@ def raw2df(
     size = raw.tell()
     # n_bytes / n_channels / n_bits_per_channel_per_sample
     n_records = int(size / n_channels / bpcps)
-    np_data = np_data.reshape(n_channels, n_records, order="F")
+    np_data = np_data.reshape(n_channels, n_records, order="C") 
 
     return pd.DataFrame(np_data)
 

@@ -53,8 +53,9 @@ def data_file(data_raw: bytes):
 def test_read(
     data_df: pd.DataFrame, data_raw: callable, data_file: callable,
 ):
-
-    df1 = dspy.raw2df(data_file(data_raw(data_df)))
+    #Test para comprobar que el dataframe que crea dspy es igual a los datos
+    #originales, ie, que hace correctamente la conversión de raw a dataframe
+    df1 = dspy.raw2df(data_file)
     df0 = data_df.transpose()  # verificar trasposición
 
     pd.testing.assert_frame_equal(df1, df0)
@@ -63,11 +64,13 @@ def test_read(
 def test_estad(
     data_df: pd.DataFrame, data_raw: callable, data_file: callable,
 ):
-    df1 = dspy.raw2df(data_file(data_raw(data_df)))
+    #Test para comprobar que los estadisticos de los dataframe son iguales
+    #import ipdb; ipdb.set_trace()
+    df1 = dspy.raw2df(data_file)
 
     df0 = data_df.transpose()  # verificar trasposición
 
     a = df1.describe()
     b = df0.describe()
 
-    pd.testing.assert_series_equal(a, b)
+    pd.testing.assert_frame_equal(a, b)
