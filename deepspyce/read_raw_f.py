@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from astropy.io import fits
-
+from astropy.table import Table
 
 def raw2df(raw: io.BufferedReader,
            dtype: np.dtype = int,
@@ -31,10 +31,12 @@ def raw2df(raw: io.BufferedReader,
     return pd.DataFrame(np_data)
 
 
-if __name__ == "__main__":
-    path = input("Please, enter your raw data path: ")
-    with open(path, "rb") as raw:
-        data = raw2df(raw)
+def df2fits(
+    data: pd.DataFrame, name: str = "test.fits", overwrite: bool = True,
+) -> None:
+    """
+    Función para crear archivo FITS desde DataFrame.
+    """
 
     hdr = fits.Header()
     # Inclui parte del sample Header de TREG_091209.cal.acs.txt, 
@@ -50,10 +52,20 @@ if __name__ == "__main__":
     hdr['FITSVER'] = ('1.6','/ FITS definition version')
     
    #-----------------------------------------------------------------------
-    primary_hdu = fits.PrimaryHDU(data, header=hdr)
-    # primary_hdu = fits.BinTableHDU(data, header=hdr, character_as_bytes=True)
-    # BinTable tira error: TypeError: Table data has incorrect type.
-    hdul = fits.HDUList([primary_hdu])
-    hdul.writeto('test.fits', overwrite=True)
-
+    # aux=struct.pack('i', len(aux))+aux.encode()
+    primary_hdu = fits.PrimaryHDU(header=hdr)
+    t = Table(np.asarray(data))
+    secondary_hdu = fits.BinTableHDU(t,header=hdr, name='SINGLE DISH')
+    hdul = fits.HDUList([primary_hdu,secondary_hdu])
+    hdul.writeto(name, overwrite=overwrite)
+    
+    return
+    
+if __name__ == "__main__":
+    path = input("Please, enter your raw data path: ")
+    #  /home/gabriel/WORK/DeepSpyce/raw_data/20201027_133329_1m.raw
+    with open(path, "rb") as raw:
+        data = raw2df(raw)
+    df2fits(data)
+    
     # This is the end
