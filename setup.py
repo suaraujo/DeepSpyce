@@ -5,14 +5,15 @@
 #   DeepSpyce Project (https://github.com/suaraujo/DeepSpyce).
 # Copyright (c) 2020, Susana Beatriz Araujo Furlan
 # License: MIT
-#   Full Text: https://github.com/suaraujo/DeepSpyce/blob/master/LICENSE.txt
+#   Full Text: https://github.com/suaraujo/DeepSpyce/blob/master/LICENSE
 
 
 # =============================================================================
 # DOCS
 # =============================================================================
 
-"""This file is for distribute and install DeepSpyce
+"""
+This file is for distribute and install DeepSpyce
 """
 
 
@@ -24,10 +25,10 @@ import os
 import pathlib
 
 from ez_setup import use_setuptools
+
 use_setuptools()
 
-from setuptools import setup
-
+from setuptools import setup  # noqa
 
 # =============================================================================
 # CONSTANTS
@@ -43,16 +44,17 @@ with open(PATH / "README.md") as fp:
 with open(PATH / "deepspyce" / "__init__.py") as fp:
     for line in fp.readlines():
         if line.startswith("__version__ = "):
-            VERSION = line.split("=", 1)[-1].replace('"', '').strip()
+            VERSION = line.split("=", 1)[-1].replace('"', "").strip()
             break
 
 
-DESCRIPTION = " "
+DESCRIPTION = "Reading raw files of radio-astronomical data"
 
 
 # =============================================================================
 # FUNCTIONS
 # =============================================================================
+
 
 def do_setup():
     setup(
@@ -60,19 +62,21 @@ def do_setup():
         version=VERSION,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
-        long_description_content_type='text/markdown',
-
+        long_description_content_type="text/markdown",
         author=[
             "Susana Beatriz Araujo Furlan",
             "Marcelo Colazo",
             "Emmanuel Gianuzzi",
-            "Gabriel Oio"],
+            "Gabriel Oio",
+        ],
         author_email="saraujo@iar.unlp.edu.ar",
         url="https://github.com/suaraujo/DeepSpyce",
+        py_modules=["ez_setup"],
+        packages=["deepspyce"],
+        # include_package_data=True,
         license="MIT",
-
+        install_requires=REQUIREMENTS,
         keywords=["deepspyce"],
-
         classifiers=[
             "Intended Audience :: Education",
             "Intended Audience :: Science/Research",
@@ -81,12 +85,9 @@ def do_setup():
             "Programming Language :: Python",
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: Implementation :: CPython",
-            "Topic :: Scientific/Engineering"],
-
-        packages=["deepspyce"],
-        py_modules=["ez_setup"],
-
-        install_requires=REQUIREMENTS)
+            "Topic :: Scientific/Engineering",
+        ],
+    )
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@
 #   DeepSpyce Project (https://github.com/suaraujo/DeepSpyce).
 # Copyright (c) 2020, Susana Beatriz Araujo Furlan
 # License: MIT
-#   Full Text: https://github.com/suaraujo/DeepSpyce/blob/master/LICENSE.txt
+#   Full Text: https://github.com/suaraujo/DeepSpyce/blob/master/LICENSE
 
 # ============================================================================
 # DOCS
@@ -25,4 +25,4 @@ __version__ = "0.0.1"
 # IMPORTS
 # =============================================================================
 
-from .read_raw_f import *  # noqa
+from .core import *  # noqa
