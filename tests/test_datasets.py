@@ -12,15 +12,13 @@
 # IMPORTS
 # ============================================================================
 
+from deepspyce import datasets
 
 import numpy as np
 
 import pandas as pd
 
-import deepspyce.datasets as datasets
-
 import pytest
-
 
 # =============================================================================
 # TESTS

@@ -12,40 +12,33 @@
 # IMPORTS
 # ============================================================================
 
-
 import io
 
-import itertools
+from deepspyce import datasets, raw2df
 
 import pandas as pd
 
-from deepspyce import datasets
-
-from deepspyce import raw2df
-
+import pytest
 
 # =============================================================================
 # TESTS
 # =============================================================================
 
 
+@pytest.mark.parametrize("fmt", [">i4", "<q", "l"])
+@pytest.mark.parametrize("shape", [(300, 2), (2048, 5), (1024, 4)])
+@pytest.mark.parametrize("top", [100_000, 10_000, 1_000_000])
+@pytest.mark.parametrize("order", ["C", "F"])
 def test_read(
-    df_and_file: callable,
+    df_and_file: callable, fmt: str, shape: tuple, top: int, order: str
 ):
     """Test for raw to dataframe conversion."""
 
-    df_and_raw = df_and_file
-    fmts = [">i4", "<q", "l"]
-    shapes = [(300, 2), (2048, 5), (1024, 4)]
-    tops = [100_000, 10_000, 1_000_000]
-    orders = ["C", "F"]
-    for fmt, shape, top, order in itertools.product(
-        fmts, shapes, tops, orders
-    ):
-        kwargs = dict(fmt=fmt, shape=shape, top=top, order=order)
-        original, file = df_and_raw(**kwargs)
-        result = raw2df(raw=file, order=order, fmt=fmt, n_channels=shape[0])
-        pd.testing.assert_frame_equal(original, result)
+    original, raw_file = df_and_file(
+        fmt=fmt, shape=shape, top=top, order=order, seed=42
+    )
+    result = raw2df(raw=raw_file, order=order, fmt=fmt, n_channels=shape[0])
+    pd.testing.assert_frame_equal(original, result)
 
 
 def test_read_fixed():

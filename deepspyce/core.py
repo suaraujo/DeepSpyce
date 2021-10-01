@@ -18,13 +18,14 @@
 # IMPORTS
 # =============================================================================
 
-
 import io
 from datetime import datetime
 
-import numpy as np
-import pandas as pd
 from astropy.io import fits
+
+import numpy as np
+
+import pandas as pd
 
 # ============================================================================
 # FUNCTIONS
@@ -51,9 +52,7 @@ def raw2df(
 
 
 def df2fits(
-    data: pd.DataFrame,
-    filename: str = "test.fits",
-    overwrite: bool = True,
+    data: pd.DataFrame, filename: str = "test.fits", overwrite: bool = True
 ) -> None:
     """Create .fits from dataframe."""
     # Sample: TREG_091209.cal.acs.txt [Single Dish FITS (SDFITS)]

@@ -12,7 +12,6 @@
 # IMPORTS
 # ============================================================================
 
-
 import io
 
 import numpy as np
@@ -21,34 +20,33 @@ import pandas as pd
 
 import pytest
 
-
 # =============================================================================
 # FIXTURES
 # =============================================================================
 
 
-@pytest.fixture
-def df_and_file() -> callable:
-    def df_rand(
-        fmt: np.dtype = ">i8", shape: tuple = (2048, 5), top: int = 100_000
-    ) -> pd.DataFrame:
-        rng = np.random.RandomState(42)
-        dt = np.dtype(fmt)
-        df = pd.DataFrame(rng.randint(top, size=shape), dtype=dt)
-
-        return df
-
-    def df_and_raw(
+@pytest.fixture(scope="session")
+def df_rand():
+    def make(
         fmt: np.dtype = ">i8",
         shape: tuple = (2048, 5),
         top: int = 100_000,
-        order: str = "C",
-        df_rand: callable = df_rand,
-    ) -> io.BytesIO:
-        df = df_rand(fmt=fmt, shape=shape, top=top)
+        seed: int = None,
+    ):
+        rng = np.random.default_rng(seed=seed)
+        dt = np.dtype(fmt)
+        df = pd.DataFrame(rng.integers(top, size=shape), dtype=dt)
+        return df
+
+    return make
+
+
+@pytest.fixture(scope="session")
+def df_and_file(df_rand) -> callable:
+    def make(order: str = "C", **kwargs) -> io.BytesIO:
+        df = df_rand(**kwargs)
         df_bytes = np.array(df).tobytes(order)
         df_bytes_io = io.BytesIO(df_bytes)
-
         return df, df_bytes_io
 
-    return df_and_raw
+    return make
