@@ -1,0 +1,11 @@
+include LICENSE
+include README.md
+recursive-include deepspyce *.py
+recursive-include deepspyce *.iar
+recursive-include deepspyce *.csv
+recursive-include deepspyce *.raw
+
+exclude tox.ini
+exclude pyproject.toml
+recursive-exclude tests *
+recursive-exclude draft *

@@ -7,22 +7,31 @@
 # License: MIT
 #   Full Text: https://github.com/suaraujo/DeepSpyce/blob/master/LICENSE
 
+
 # ============================================================================
-# DOCS
-# ============================================================================
-
-"""
-DeepSpyce.
-
-DeepSpyce is a module focused on the manipulation of raw data into
-other formats of interest for radio astronomy purpouses.
-
-"""
-
-__version__ = "0.0.1"
-
-# =============================================================================
 # IMPORTS
+# ============================================================================
+
+from deepspyce import datasets, df2Fits
+
+import pytest
+
+# =============================================================================
+# TESTS
 # =============================================================================
 
-from .core import *  # noqa
+
+def test_WrongDir(Wrong_Path):
+    """Test for wrong Dir at fits conversion."""
+    df = datasets.load_csv_test()
+    with pytest.raises(IOError):
+        df2Fits(data=df, path=Wrong_Path)
+
+
+def test_df2Fits(tmp_file_path):
+    """Test for converting and writing DataFrame into .fits file."""
+    df = datasets.load_csv_test()
+    path = tmp_file_path(filename="data.fits")
+    df2Fits(data=df, path=path)
+    assert path.exists()
+    assert path.size() == 40320
