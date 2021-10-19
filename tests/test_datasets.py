@@ -34,22 +34,43 @@ def test_load_csv():
     np.testing.assert_almost_equal(result[1].mean(), 16153.399902, 6)
 
 
-def test_load_raw():
-    """Test for loading raw_test file."""
-    result = datasets.load_raw_test()
+def test_load_raw_bin():
+    """Test for opening raw_test file."""
+    result = datasets.load_raw_test(ret_df=False)
 
     assert isinstance(result, bytes)
     assert len(result) == 32768
 
 
-def test_load_raw_big():
-    """Test for the size of the raw_test file."""
-    result = datasets.load_raw()
+def test_load_raw_1m_bin():
+    """Test for the size of the raw_test_1m file."""
+    result = datasets.load_raw_1m(ret_df=False)
 
     assert isinstance(result, bytes)
     assert len(result) == 11796480
     with pytest.raises(UnicodeDecodeError):
         result.decode()
+
+
+def test_load_raw_df():
+    """Test for opening raw_test file as DataFrame."""
+    result = datasets.load_raw_test()
+
+    assert isinstance(result, pd.DataFrame)
+    assert result.shape == (2048, 2)
+    np.testing.assert_almost_equal(result[0].mean(), 16174.182128, 6)
+    np.testing.assert_almost_equal(result[1].mean(), 16153.399902, 6)
+
+
+def test_load_raw_1m_df():
+    """Test for the size of the raw_test file."""
+    result = datasets.load_raw_1m()
+
+    assert isinstance(result, pd.DataFrame)
+    assert result.shape == (2048, 720)
+    np.testing.assert_almost_equal(result[0].mean(), 16174.182128, 6)
+    np.testing.assert_almost_equal(result.iloc[0].mean(), 48768.425, 3)
+    np.testing.assert_almost_equal(result.iloc[2047].mean(), 0.0, 5)
 
 
 def test_load_iar():

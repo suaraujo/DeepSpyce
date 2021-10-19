@@ -19,9 +19,11 @@
 # =============================================================================
 
 import io
+import os
 from datetime import datetime
 
 from astropy.io import fits
+from astropy.table import Table
 
 import numpy as np
 
@@ -32,13 +34,13 @@ import pandas as pd
 # ============================================================================
 
 
-def raw2df(
+def Raw2df(
     raw: io.BufferedReader,
     n_channels: int = 2048,
     fmt: np.dtype = ">i8",
     order: str = "F",
 ) -> pd.DataFrame:
-    """Convert raw data to dataframe."""
+    """Convert buffered raw data to dataframe."""
     # Transformamos de str(bytes) a np.array
     data = raw.read()
     dt = np.dtype(fmt)
@@ -51,10 +53,13 @@ def raw2df(
     return pd.DataFrame(np_data)
 
 
-def df2fits(
-    data: pd.DataFrame, filename: str = "test.fits", overwrite: bool = True
+def df2Fits(
+    data: pd.DataFrame, path: str = "test.fits", overwrite: bool = True
 ) -> None:
     """Create .fits from dataframe."""
+    DIR = os.path.dirname(path)
+    if (DIR != "") and (not os.path.isdir(DIR)):
+        raise IOError("{} is not an existing directory.".format(DIR))
     # Sample: TREG_091209.cal.acs.txt [Single Dish FITS (SDFITS)]
     hdr = fits.Header()
     hdr["SIMPLE"] = ("T", "/ conforms to FITS standard")
@@ -71,17 +76,24 @@ def df2fits(
     )
     hdr["FITSVER"] = ("1.6", "/ FITS definition version")
 
-    primary_hdu = fits.PrimaryHDU(data, header=hdr)
-    hdul = fits.HDUList([primary_hdu])
-    hdul.writeto(filename, overwrite=overwrite)
+    Primary_hdu = fits.PrimaryHDU(header=hdr)
+    Tab = Table(np.asarray(data))
+    BinTable_hdu = fits.BinTableHDU(Tab, header=hdr, name="SINGLE DISH")
+    hdul = fits.HDUList([Primary_hdu, BinTable_hdu])
+    hdul.writeto(path, overwrite=overwrite)
 
     return
 
 
-if __name__ == "__main__":
-    path = input("Please, enter your raw data path: ")
-    with open(path, "rb") as raw:
-        data = raw2df(raw)
-    df2fits(data)
-
-    # This is the end
+def ReadRaw(
+    path: str,
+    n_channels: int = 2048,
+    fmt: np.dtype = ">i8",
+    order: str = "F",
+) -> pd.DataFrame:
+    """Read a raw data file, and returns a dataframe."""
+    if os.path.isfile(path):
+        with open(path, "rb") as raw:
+            return Raw2df(raw, n_channels=n_channels, fmt=fmt, order=order)
+    else:
+        raise FileNotFoundError("{} is not a valid Path".format(path))

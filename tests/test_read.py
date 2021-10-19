@@ -14,7 +14,7 @@
 
 import io
 
-from deepspyce import datasets, raw2df
+from deepspyce import Raw2df, ReadRaw, datasets
 
 import pandas as pd
 
@@ -29,24 +29,39 @@ import pytest
 @pytest.mark.parametrize("shape", [(300, 2), (2048, 5), (1024, 4)])
 @pytest.mark.parametrize("top", [100_000, 10_000, 1_000_000])
 @pytest.mark.parametrize("order", ["C", "F"])
-def test_read(
+def test_Raw2df(
     df_and_file: callable, fmt: str, shape: tuple, top: int, order: str
 ):
-    """Test for raw to dataframe conversion."""
+    """Test for buffered raw to dataframe conversion."""
 
     original, raw_file = df_and_file(
         fmt=fmt, shape=shape, top=top, order=order, seed=42
     )
-    result = raw2df(raw=raw_file, order=order, fmt=fmt, n_channels=shape[0])
+    result = Raw2df(raw=raw_file, order=order, fmt=fmt, n_channels=shape[0])
     pd.testing.assert_frame_equal(original, result)
 
 
-def test_read_fixed():
-    """Fixed test for raw to dataframe conversion."""
+def test_Raw2df_fixed():
+    """Test for buffered template raw to dataframe conversion."""
     original = datasets.load_csv_test()
-    result = raw2df(io.BytesIO(datasets.load_raw_test()))
+    result = Raw2df(raw=io.BytesIO(datasets.load_raw_test(ret_df=False)))
 
     pd.testing.assert_frame_equal(original, result)
+
+
+def test_ReadRaw_fixed():
+    """Test for reading template raw to dataframe conversion."""
+    path = datasets.PATH / "20201027_133329_test.raw"
+    original = datasets.load_csv_test()
+    result = ReadRaw(path=path)
+
+    pd.testing.assert_frame_equal(original, result)
+
+
+def test_WrongPath(Wrong_Path):
+    """Test for wrong raw path at dataframe conversion."""
+    with pytest.raises(FileNotFoundError):
+        ReadRaw(path=Wrong_Path)
 
 
 # def test_estad(

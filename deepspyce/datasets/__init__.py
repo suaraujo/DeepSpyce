@@ -21,7 +21,7 @@
 import os
 import pathlib
 
-import numpy as np
+from deepspyce import ReadRaw
 
 import pandas as pd
 
@@ -36,33 +36,39 @@ PATH = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 # ============================================================================
 
 
-def load_raw():
-    """Load raw data file."""
+def load_raw_1m(ret_df: bool = True):
+    """Load template raw data file."""
     path = PATH / "20201027_133329_1m.raw"
 
-    with open(path, "rb") as file:
-        raw = file.read()
-    return raw
+    if ret_df:
+        return ReadRaw(path)
+    else:
+        with open(path, "rb") as file:
+            raw = file.read()
+        return raw
 
 
-def load_raw_test():
-    """Load raw_test data file."""
+def load_raw_test(ret_df: bool = True):
+    """Load template raw_test data file."""
     path = PATH / "20201027_133329_test.raw"
 
-    with open(path, "rb") as file:
-        raw_test = file.read()
-    return raw_test
+    if ret_df:
+        return ReadRaw(path)
+    else:
+        with open(path, "rb") as file:
+            raw_test = file.read()
+        return raw_test
 
 
-def load_csv_test(fmt: np.dtype = ">i8") -> pd.DataFrame:
-    """Load csv_test data file."""
+def load_csv_test() -> pd.DataFrame:
+    """Load template csv_test data file."""
     path = PATH / "20201027_133329_test.csv"
 
-    return pd.read_csv(path, dtype=fmt, header=None)
+    return pd.read_csv(path, dtype=">i8", header=None)
 
 
 def load_iar():
-    """Load iar data file."""
+    """Load template .iar file."""
     path = PATH / "J0437-4715_1_A1.iar"
 
     with open(path, "r") as file:

@@ -50,3 +50,18 @@ def df_and_file(df_rand) -> callable:
         return df, df_bytes_io
 
     return make
+
+
+@pytest.fixture(scope="session")
+def tmp_file_path(tmpdir_factory):
+    def makefile(filename: str = "temp.fits") -> str:
+        datadir = tmpdir_factory.mktemp("data").join(filename)
+        return datadir
+
+    return makefile
+
+
+@pytest.fixture(scope="session")
+def Wrong_Path():
+
+    return "/Not/A/Valid/Path"
