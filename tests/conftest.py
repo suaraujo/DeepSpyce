@@ -42,7 +42,7 @@ def df_rand():
 
 
 @pytest.fixture(scope="session")
-def df_and_file(df_rand) -> callable:
+def df_and_buff(df_rand) -> callable:
     def make(order: str = "C", **kwargs) -> io.BytesIO:
         df = df_rand(**kwargs)
         df_bytes = np.array(df).tobytes(order)
@@ -53,15 +53,14 @@ def df_and_file(df_rand) -> callable:
 
 
 @pytest.fixture(scope="session")
-def tmp_file_path(tmpdir_factory):
-    def makefile(filename: str = "temp.fits") -> str:
-        datadir = tmpdir_factory.mktemp("data").join(filename)
-        return datadir
+def stream() -> io.BytesIO:
+    def make(data: any = None):
+        return io.BytesIO(data)
 
-    return makefile
+    return make
 
 
 @pytest.fixture(scope="session")
-def Wrong_Path():
+def wrong_path():
 
     return "/Not/A/Valid/Path"

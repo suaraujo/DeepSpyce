@@ -34,32 +34,29 @@ import pandas as pd
 # ============================================================================
 
 
-def Raw2df(
-    raw: io.BufferedReader,
+def buff_raw_to_df(
+    buff_raw: io.BufferedReader,
     n_channels: int = 2048,
     fmt: np.dtype = ">i8",
     order: str = "F",
 ) -> pd.DataFrame:
     """Convert buffered raw data to dataframe."""
     # Transformamos de str(bytes) a np.array
-    data = raw.read()
+    data = buff_raw.read()
     dt = np.dtype(fmt)
     np_data = np.array(np.frombuffer(data, dtype=dt))
     bytes_per_data = dt.alignment
-    total_bytes = raw.tell()
+    total_bytes = buff_raw.tell()
     n_records = int(total_bytes / n_channels / bytes_per_data)
     np_data = np_data.reshape(n_channels, n_records, order=order)
 
     return pd.DataFrame(np_data)
 
 
-def df2Fits(
-    data: pd.DataFrame, path: str = "test.fits", overwrite: bool = True
+def df_to_fits(
+    data: pd.DataFrame, path_or_stream: str, overwrite: bool = False
 ) -> None:
     """Create .fits from dataframe."""
-    DIR = os.path.dirname(path)
-    if (DIR != "") and (not os.path.isdir(DIR)):
-        raise IOError("{} is not an existing directory.".format(DIR))
     # Sample: TREG_091209.cal.acs.txt [Single Dish FITS (SDFITS)]
     hdr = fits.Header()
     hdr["SIMPLE"] = ("T", "/ conforms to FITS standard")
@@ -76,24 +73,33 @@ def df2Fits(
     )
     hdr["FITSVER"] = ("1.6", "/ FITS definition version")
 
-    Primary_hdu = fits.PrimaryHDU(header=hdr)
-    Tab = Table(np.asarray(data))
-    BinTable_hdu = fits.BinTableHDU(Tab, header=hdr, name="SINGLE DISH")
-    hdul = fits.HDUList([Primary_hdu, BinTable_hdu])
-    hdul.writeto(path, overwrite=overwrite)
+    primary_hdu = fits.PrimaryHDU(header=hdr)
+    tab = Table(np.asarray(data))
+    bintable_hdu = fits.BinTableHDU(tab, header=hdr, name="SINGLE DISH")
+    hdul = fits.HDUList([primary_hdu, bintable_hdu])
+    hdul.writeto(path_or_stream, overwrite=overwrite)
 
     return
 
 
-def ReadRaw(
-    path: str,
+def read_raw(
+    path_or_stream,
     n_channels: int = 2048,
     fmt: np.dtype = ">i8",
     order: str = "F",
 ) -> pd.DataFrame:
     """Read a raw data file, and returns a dataframe."""
-    if os.path.isfile(path):
-        with open(path, "rb") as raw:
-            return Raw2df(raw, n_channels=n_channels, fmt=fmt, order=order)
+    if isinstance(path_or_stream, (str, bytes, os.PathLike)):
+        if os.path.isfile(path_or_stream):
+            with open(path_or_stream, "rb") as raw:
+                return buff_raw_to_df(
+                    raw, n_channels=n_channels, fmt=fmt, order=order
+                )
+        else:
+            raise FileNotFoundError(
+                "{} is not a valid Path".format(path_or_stream)
+            )
     else:
-        raise FileNotFoundError("{} is not a valid Path".format(path))
+        return buff_raw_to_df(
+            path_or_stream, n_channels=n_channels, fmt=fmt, order=order
+        )
