@@ -48,10 +48,19 @@ def test_raw_to_df_fixed(stream):
     result = buff_raw_to_df(buff_raw=stream_raw)
 
     pd.testing.assert_frame_equal(original, result)
+    
+    
+def test_read_raw_buff(stream):
+    """Test for reading template buffered raw to dataframe conversion."""
+    original = datasets.load_csv_test()
+    stream_raw = stream(datasets.load_raw_test(ret_df=False))
+    result = read_raw(path_or_stream=stream_raw)
+
+    pd.testing.assert_frame_equal(original, result)
 
 
 def test_read_raw_fixed():
-    """Test for reading template raw to dataframe conversion."""
+    """Test for reading template raw file to dataframe conversion."""
     path = datasets.PATH / "20201027_133329_test.raw"
     original = datasets.load_csv_test()
     result = read_raw(path_or_stream=path)
