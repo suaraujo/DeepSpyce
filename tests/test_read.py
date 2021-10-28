@@ -48,8 +48,8 @@ def test_raw_to_df_fixed(stream):
     result = buff_raw_to_df(buff_raw=stream_raw)
 
     pd.testing.assert_frame_equal(original, result)
-    
-    
+
+
 def test_read_raw_buff(stream):
     """Test for reading template buffered raw to dataframe conversion."""
     original = datasets.load_csv_test()

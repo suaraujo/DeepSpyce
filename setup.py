@@ -24,10 +24,6 @@ This file is for distribute and install DeepSpyce
 import os
 import pathlib
 
-from ez_setup import use_setuptools
-
-use_setuptools()
-
 from setuptools import setup  # noqa
 
 # =============================================================================
@@ -71,7 +67,6 @@ def do_setup():
         ],
         author_email="saraujo@iar.unlp.edu.ar",
         url="https://github.com/suaraujo/DeepSpyce",
-        py_modules=["ez_setup"],
         packages=["deepspyce", "deepspyce.datasets"],
         include_package_data=True,
         license="MIT",
