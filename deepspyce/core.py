@@ -97,7 +97,7 @@ def read_raw(
                 )
         else:
             raise FileNotFoundError(
-                "{} is not a valid Path".format(path_or_stream)
+                "{} is not a valid path".format(path_or_stream)
             )
     else:
         return buff_raw_to_df(
