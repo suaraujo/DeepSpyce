@@ -12,7 +12,7 @@
 # IMPORTS
 # ============================================================================
 
-from deepspyce import datasets, df2Fits
+from deepspyce import datasets, df_to_fits
 
 import pytest
 
@@ -21,17 +21,17 @@ import pytest
 # =============================================================================
 
 
-def test_WrongDir(Wrong_Path):
+def test_wrong_path(wrong_path):
     """Test for wrong Dir at fits conversion."""
     df = datasets.load_csv_test()
     with pytest.raises(IOError):
-        df2Fits(data=df, path=Wrong_Path)
+        df_to_fits(data=df, path_or_stream=wrong_path)
 
 
-def test_df2Fits(tmp_file_path):
+def test_df_to_fits(stream):
     """Test for converting and writing DataFrame into .fits file."""
     df = datasets.load_csv_test()
-    path = tmp_file_path(filename="data.fits")
-    df2Fits(data=df, path=path)
-    assert path.exists()
-    assert path.size() == 40320
+    path = stream()
+    df_to_fits(data=df, path_or_stream=path)
+
+    assert path.tell() == 40320
