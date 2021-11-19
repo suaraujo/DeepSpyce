@@ -12,7 +12,7 @@
 # IMPORTS
 # ============================================================================
 
-from deepspyce import buff_raw_to_df, datasets, read_raw
+from deepspyce import datasets, df_to_fits, raw_to_df
 
 import pandas as pd
 
@@ -30,58 +30,50 @@ import pytest
 def test_raw_to_df(
     df_and_buff: callable, fmt: str, shape: tuple, top: int, order: str
 ):
-    """Test for buffered raw to dataframe conversion."""
+    """Test for reading mock raw files to dataframe conversion."""
 
     original, buff_raw = df_and_buff(
         fmt=fmt, shape=shape, top=top, order=order, seed=42
     )
-    result = buff_raw_to_df(
-        buff_raw=buff_raw, order=order, fmt=fmt, n_channels=shape[0]
+    result = raw_to_df(
+        path_or_stream=buff_raw, n_channels=shape[0], fmt=fmt, order=order
     )
     pd.testing.assert_frame_equal(original, result)
 
 
-def test_raw_to_df_fixed(stream):
-    """Test for buffered template raw to dataframe conversion."""
-    original = datasets.load_csv_test()
-    stream_raw = stream(datasets.load_raw_test(ret_df=False))
-    result = buff_raw_to_df(buff_raw=stream_raw)
-
-    pd.testing.assert_frame_equal(original, result)
-
-
-def test_read_raw_buff(stream):
-    """Test for reading template buffered raw to dataframe conversion."""
-    original = datasets.load_csv_test()
-    stream_raw = stream(datasets.load_raw_test(ret_df=False))
-    result = read_raw(path_or_stream=stream_raw)
-
-    pd.testing.assert_frame_equal(original, result)
-
-
-def test_read_raw_fixed():
+def test_raw_to_df_template():
     """Test for reading template raw file to dataframe conversion."""
     path = datasets.PATH / "20201027_133329_test.raw"
     original = datasets.load_csv_test()
-    result = read_raw(path_or_stream=path)
+    result = raw_to_df(path_or_stream=path)
 
     pd.testing.assert_frame_equal(original, result)
 
 
-def test_read_raw_wrong_path(wrong_path):
+@pytest.mark.parametrize("data", [False, 0, 0.0, [0], (0, 0.0), {0: 0}])
+def test_raw_to_df_wrong_input(data: any):
+    """Test for wrong input at dataframe conversion."""
+    with pytest.raises(AttributeError):
+        raw_to_df(path_or_stream=data)
+
+
+def test_raw_to_df_wrong_path(wrong_path):
     """Test for wrong raw path at dataframe conversion."""
     with pytest.raises(FileNotFoundError):
-        read_raw(path_or_stream=wrong_path)
+        raw_to_df(path_or_stream=wrong_path)
 
 
-# def test_estad(
-#     data_df: pd.DataFrame, data_file: io.BufferedReader,
-# ):
+def test_df_to_fits_wrong_path(wrong_path):
+    """Test for wrong Dir at fits conversion."""
+    df = datasets.load_csv_test()
+    with pytest.raises(IOError):
+        df_to_fits(data=df, path_or_stream=wrong_path)
 
-#     df0 = raw2df(data_file)
-#     df1 = data_df
 
-#     a = df0.describe()
-#     b = df1.describe()
+def test_df_to_fits(stream):
+    """Test for converting and writing DataFrame into .fits file."""
+    df = datasets.load_csv_test()
+    path = stream()
+    df_to_fits(data=df, path_or_stream=path)
 
-#     pd.testing.assert_frame_equal(a, b)
+    assert path.tell() == 40320

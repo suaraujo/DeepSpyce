@@ -13,6 +13,7 @@
 # ============================================================================
 
 import io
+import pathlib
 
 import numpy as np
 
@@ -42,17 +43,6 @@ def df_rand():
 
 
 @pytest.fixture(scope="session")
-def df_and_buff(df_rand) -> callable:
-    def make(order: str = "C", **kwargs) -> io.BytesIO:
-        df = df_rand(**kwargs)
-        df_bytes = np.array(df).tobytes(order)
-        df_bytes_io = io.BytesIO(df_bytes)
-        return df, df_bytes_io
-
-    return make
-
-
-@pytest.fixture(scope="session")
 def stream() -> io.BytesIO:
     def make(data: any = None):
         return io.BytesIO(data)
@@ -61,6 +51,17 @@ def stream() -> io.BytesIO:
 
 
 @pytest.fixture(scope="session")
-def wrong_path():
+def df_and_buff(df_rand, stream) -> callable:
+    def make(order: str = "C", **kwargs) -> io.BytesIO:
+        df = df_rand(**kwargs)
+        df_bytes = np.array(df).tobytes(order)
+        df_bytes_io = stream(df_bytes)
+        return df, df_bytes_io
 
-    return "/Not/A/Valid/Path"
+    return make
+
+
+@pytest.fixture(scope="session")
+def wrong_path() -> str:
+
+    return pathlib.Path("Not", "A", "Valid", "Dir").resolve()
