@@ -12,7 +12,7 @@
 # DOCS
 # =============================================================================
 
-"""Module with core functions."""
+"""Module with I/O functions."""
 
 # =============================================================================
 # IMPORTS
@@ -34,7 +34,7 @@ import pandas as pd
 # ============================================================================
 
 
-def buff_raw_to_df(
+def _buff_raw_to_df(
     buff_raw: io.BufferedReader,
     n_channels: int = 2048,
     fmt: np.dtype = ">i8",
@@ -51,6 +51,29 @@ def buff_raw_to_df(
     np_data = np_data.reshape(n_channels, n_records, order=order)
 
     return pd.DataFrame(np_data)
+
+
+def raw_to_df(
+    path_or_stream,
+    n_channels: int = 2048,
+    fmt: np.dtype = ">i8",
+    order: str = "F",
+) -> pd.DataFrame:
+    """Read a raw data file, and returns a dataframe."""
+    if isinstance(path_or_stream, (str, bytes, os.PathLike)):
+        if os.path.isfile(path_or_stream):
+            with open(path_or_stream, "rb") as raw:
+                return _buff_raw_to_df(
+                    raw, n_channels=n_channels, fmt=fmt, order=order
+                )
+        else:
+            raise FileNotFoundError(
+                "{} is not a valid path".format(path_or_stream)
+            )
+    else:
+        return _buff_raw_to_df(
+            path_or_stream, n_channels=n_channels, fmt=fmt, order=order
+        )
 
 
 def df_to_fits(
@@ -80,26 +103,3 @@ def df_to_fits(
     hdul.writeto(path_or_stream, overwrite=overwrite)
 
     return
-
-
-def read_raw(
-    path_or_stream,
-    n_channels: int = 2048,
-    fmt: np.dtype = ">i8",
-    order: str = "F",
-) -> pd.DataFrame:
-    """Read a raw data file, and returns a dataframe."""
-    if isinstance(path_or_stream, (str, bytes, os.PathLike)):
-        if os.path.isfile(path_or_stream):
-            with open(path_or_stream, "rb") as raw:
-                return buff_raw_to_df(
-                    raw, n_channels=n_channels, fmt=fmt, order=order
-                )
-        else:
-            raise FileNotFoundError(
-                "{} is not a valid path".format(path_or_stream)
-            )
-    else:
-        return buff_raw_to_df(
-            path_or_stream, n_channels=n_channels, fmt=fmt, order=order
-        )

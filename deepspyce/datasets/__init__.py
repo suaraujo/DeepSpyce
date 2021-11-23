@@ -21,7 +21,7 @@
 import os
 import pathlib
 
-from deepspyce import read_raw
+from deepspyce import raw_to_df
 
 import pandas as pd
 
@@ -41,7 +41,7 @@ def load_raw_1m(ret_df: bool = True):
     path = PATH / "20201027_133329_1m.raw"
 
     if ret_df:
-        return read_raw(path)
+        return raw_to_df(path)
     else:
         with open(path, "rb") as file:
             raw = file.read()
@@ -53,7 +53,7 @@ def load_raw_test(ret_df: bool = True):
     path = PATH / "20201027_133329_test.raw"
 
     if ret_df:
-        return read_raw(path)
+        return raw_to_df(path)
     else:
         with open(path, "rb") as file:
             raw_test = file.read()
