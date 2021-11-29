@@ -11,18 +11,17 @@
 # DOCS
 # ============================================================================
 
-"""
-DeepSpyce.
-
-DeepSpyce is a module focused on the manipulation of raw data into
-other formats of interest for radio astronomy purpouses.
-
-"""
-
-__version__ = "0.0.1"
+"""Module DeepSpyce.io provides input/output tools."""
 
 # =============================================================================
 # IMPORTS
 # =============================================================================
 
-from . import io  # noqa
+from .filterbank import (  # noqa
+    df_to_filterbank,  # noqa
+    iar_to_fil_header,  # noqa
+    raw_to_filterbank,  # noqa
+)  # noqa
+from .fits import df_to_fits, make_fits_header, raw_to_fits  # noqa
+from .iar import read_iar  # noqa
+from .raw import raw_to_df  # noqa

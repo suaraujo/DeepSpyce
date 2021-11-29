@@ -63,7 +63,7 @@ def test_load_raw_df():
 
 
 def test_load_raw_1m_df():
-    """Test for the size of the raw_test file."""
+    """Test for opening raw_test_1m file as DataFrame."""
     result = datasets.load_raw_1m()
 
     assert isinstance(result, pd.DataFrame)
@@ -74,10 +74,13 @@ def test_load_raw_1m_df():
 
 
 def test_load_iar():
-    """Test for the size of the raw_test file."""
+    """Test for opening test iar file."""
     result = datasets.load_iar()
 
-    assert isinstance(result, str)
-    assert len(result) == 370
-    assert len(result.splitlines()) == 16
-    assert len([letter for letter in result if letter.isupper()]) == 46
+    assert isinstance(result, dict)
+    assert len(result) == 16
+    assert result["Source Name"] == "J0437-4715_1_A1"
+    assert result["Reference DM"] == 2.64476
+    np.testing.assert_allclose(
+        [type(v) == float for v in list(result.values())[1:]], True
+    )

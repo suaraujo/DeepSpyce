@@ -67,7 +67,12 @@ def do_setup():
         ],
         author_email="saraujo@iar.unlp.edu.ar",
         url="https://github.com/suaraujo/DeepSpyce",
-        packages=["deepspyce", "deepspyce.datasets"],
+        packages=[
+            "deepspyce",
+            "deepspyce.datasets",
+            "deepspyce.io",
+            "deepspyce.utils",
+        ],
         include_package_data=True,
         license="MIT",
         install_requires=REQUIREMENTS,
