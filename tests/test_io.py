@@ -123,37 +123,38 @@ class TestFits:
         assert header["MAGICNUM"] == 42
         assert header["ORIGIN"] == "IAR"
 
-    def test_df_to_fits(self, stream: callable):
+    def test_df_to_fits(self, stream: callable, df_rand: callable):
         """Test for writing DataFrame into .fits file."""
-        df = datasets.load_csv_test()
+        df = df_rand()
         path = stream()
         df_to_fits(df, path)
 
-        assert path.tell() == 40320
+        assert path.tell() == 89280
 
-    def test_df_to_fits_wrong_path(self, wrong_path: str):
+    def test_df_to_fits_wrong_path(self, wrong_path: str, df_rand: callable):
         """Test for wrong Dir at fits conversion."""
-        df = datasets.load_csv_test()
+        df = df_rand()
 
         with pytest.raises(OSError):
             df_to_fits(df, wrong_path)
 
-    def test_df_to_fits_and_header(self, stream: callable):
+    def test_df_to_fits_and_header(self, stream: callable, df_rand: callable):
         """Test for writing DataFrame into .fits file."""
-        df = datasets.load_csv_test()
+        df = df_rand()
         hdr = astrofits.Header()
         hdr["MAGICNUM"] = 42
         path = stream()
         df_to_fits(df, path, header=hdr)
 
-        assert path.tell() == 40320
+        assert path.tell() == 89280
 
-    def test_raw_to_fits(self, stream: callable):
+    def test_raw_to_fits(self, stream: callable, df_and_buff: callable):
         """Test for writing raw data into .fits file."""
         path = stream()
-        raw_to_fits(rawpath, path)
+        _, rawstream = df_and_buff()
+        raw_to_fits(rawstream, path)
 
-        assert path.tell() == 40320
+        assert path.tell() == 89280
 
 
 class TestIar:
@@ -239,60 +240,67 @@ class TestFilterbank:
         assert isinstance(header, bytes)
         assert bin_data_type_1 in header
 
-    def test_df_to_filterbank(self, stream: callable):
+    def test_df_to_filterbank(self, stream: callable, df_rand: callable):
         """Test for building .fil from dataframe."""
-        df = datasets.load_csv_test()
+        df = df_rand()
         outf = stream()
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             df_to_filterbank(df, outfile=outf)
 
-        assert outf.tell() == 32798
+        assert outf.tell() == 81950
 
-    def test_df_to_filterbank_no_output(self):
+    def test_df_to_filterbank_no_output(self, df_rand: callable):
         """Test for building .fil from dataframe, without output."""
-        df = datasets.load_csv_test()
+        df = df_rand()
 
         with pytest.raises(OSError):
             df_to_filterbank(df)
 
-    def test_df_to_filterbank_with_header(self, stream: callable):
+    def test_df_to_filterbank_with_header(
+        self, stream: callable, df_rand: callable
+    ):
         """Test for building .fil from dataframe, with header."""
         outf = stream()
         header = dict({"MAGICN": 42})
-        df = datasets.load_csv_test()
+        df = df_rand()
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             df_to_filterbank(df, header=header, outfile=outf)
 
-        assert outf.tell() == 32812
+        assert outf.tell() == 81964
 
-    def test_df_to_filterbank_with_header_template(self, stream: callable):
+    def test_df_to_filterbank_with_header_template(
+        self, stream: callable, df_rand: callable
+    ):
         """Test for building .fil from dataframe, with header."""
         outf = stream()
         header = iar_to_fil_header(iarpath)
-        df = datasets.load_csv_test()
+        df = df_rand()
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             df_to_filterbank(df, header=header, outfile=outf)
 
-        assert outf.tell() == 33145
+        assert outf.tell() == 82297
 
     @pytest.mark.parametrize("data", [False, 0, 0.0, [0], (0, 0.0)])
-    def test_df_to_filterbank_wrong_header(self, stream: callable, data: any):
+    def test_df_to_filterbank_wrong_header(
+        self, stream: callable, data: any, df_rand: callable
+    ):
         """Test for building .fil from dataframe, with wrong header."""
-        df = datasets.load_csv_test()
+        df = df_rand()
         outf = stream()
 
         with pytest.raises(TypeError):
             df_to_filterbank(df, header=data, outfile=outf)
 
-    def test_raw_to_filterbank(self, stream: callable):
+    def test_raw_to_filterbank(self, stream: callable, df_and_buff: callable):
         """Test for building .fil from raw file."""
         outf = stream()
+        _, rawstream = df_and_buff()
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            raw_to_filterbank(rawpath, outfile=outf)
+            raw_to_filterbank(rawstream, outfile=outf)
 
-        assert outf.tell() == 32798
+        assert outf.tell() == 81950
         assert files_utils.is_opened(outf)

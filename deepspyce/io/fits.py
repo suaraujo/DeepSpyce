@@ -59,6 +59,7 @@ def make_fits_header(
             "/ this file was created by DeepSpyce",
         )
         header["FITSVER"] = ("1.6", "/ FITS definition version")
+
     return header
 
 
@@ -75,6 +76,7 @@ def df_to_fits(
     bintable_hdu = fits.BinTableHDU(tab, header=hdr, name="SINGLE DISH")
     hdul = fits.HDUList([primary_hdu, bintable_hdu])
     hdul.writeto(outfile, overwrite=overwrite)
+
     return
 
 
@@ -90,4 +92,5 @@ def raw_to_fits(
     """Create .fits from .raw file."""
     data = raw_to_df(rawfile, n_channels, fmt, order)
     df_to_fits(data, outfile, overwrite, header)
+
     return

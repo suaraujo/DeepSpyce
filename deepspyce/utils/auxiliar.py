@@ -37,3 +37,5 @@ def data_to_bytes(
 def deepwarn(message):
     """Generate a warning."""
     warnings.warn(message, stacklevel=2)
+
+    return

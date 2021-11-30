@@ -49,6 +49,7 @@ def open_file(
     """Open a file."""
     if (mode in wmodes) and (not overwrite) and file_exists(path_str):
         raise FileExistsError("File will not be overwritten.")
+
     return open(path_str, mode)
 
 
@@ -60,6 +61,7 @@ def is_filelike(fileobj: io.FileIO) -> bool:
         return is_filelike(fileobj.buffer)
     elif hasattr(fileobj, "raw"):
         return is_filelike(fileobj.raw)
+
     return False
 
 
@@ -70,6 +72,7 @@ def get_file_attr(fileobj: io.FileIO, attr: str):
     if not is_filelike(fileobj):
         raise OSError("Input is not a file.")
     deepwarn(f"Unable to determine the file attribute {attr}.")
+
     return
 
 
@@ -80,6 +83,7 @@ def call_file_method(fileobj: io.FileIO, method: str):
     if not is_filelike(fileobj):
         raise OSError("Input is not a file.")
     deepwarn(f"Unable to determine call file method {method}.")
+
     return
 
 
@@ -111,6 +115,7 @@ def read_file(path_or_stream: os.PathLike, mode: str = "r") -> str:
         return data
     if is_readable(path_or_stream):
         return path_or_stream.read()
+
     raise OSError(f"Could not read {path_or_stream}")
 
 
@@ -130,4 +135,5 @@ def write_to_file(
     if is_writable(path_or_stream):
         path_or_stream.write(data)
         return
+
     raise OSError(f"Could not write data into {path_or_stream}")

@@ -36,4 +36,5 @@ def read_iar(iarfile: os.PathLike) -> dict:
             iar[key] = float(value)
         except ValueError:
             continue
+
     return iar

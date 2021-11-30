@@ -26,6 +26,7 @@ from deepspyce.utils.auxiliar import data_to_bytes, deepwarn
 from deepspyce.utils.files_utils import (
     get_file_attr,
     is_filelike,
+    read_file,
     write_to_file,
 )
 
@@ -34,7 +35,6 @@ import numpy as np
 import pandas as pd
 
 from .iar import read_iar
-from .raw import _read_raw
 
 # ============================================================================
 # FUNCTIONS
@@ -92,15 +92,11 @@ def _iardict_to_fil_header(iardict: dict) -> dict:
     }
 
 
-def _find_key_pos(header: dict, *key) -> None:
-    keys = list(header.keys())
-    return [keys.index(k) if k in keys else None for k in key]
-
-
 def _check_key_pos(
     header: dict, key: str, pos: int, verb: bool = False
 ) -> bool:
-    loc = _find_key_pos(header, key)[0]
+    keys = list(header.keys())
+    loc = keys.index(key) if key in keys else None
     if loc == pos:
         return True
     if loc is None:
@@ -109,6 +105,7 @@ def _check_key_pos(
         return None
     if verb:
         deepwarn(f"{key} is not in the {pos} header key.")
+
     return False
 
 
@@ -126,6 +123,7 @@ def check_header_start_end(header: dict, verb: bool = False) -> tuple:
         end = False
     if (start and end) and verb:
         print("HEADER_START and HEADER END are OK!.")
+
     return (start, end)
 
 
@@ -142,27 +140,25 @@ def fixed_header_start_end(header: dict, check: bool = True) -> dict:
         if key not in [hs, he]:
             fixedheader[key] = value
     fixedheader[he] = None
+
     return fixedheader
 
 
-def _encode(name: str, value: any = None) -> bytes:
-    ret = struct.pack("I", len(name)) + name.encode()
-    if value is not None:
-        if isinstance(value, str):
-            ret = ret + struct.pack("I", len(value)) + value.encode()
-        elif isinstance(value, int):
-            ret = ret + struct.pack("<l", value)
-        else:
-            ret = ret + struct.pack("<d", value)
-    return ret
-
-
-def _encode_dict_key(dicc: dict, key: str) -> bytes:
-    return _encode(key, dicc.get(key))
-
-
 def _encode_header(hedicc: dict) -> bytes:
-    return b"".join([_encode_dict_key(hedicc, key) for key in hedicc])
+
+    bina = b""
+    for key, value in hedicc.items():
+        ret = struct.pack("I", len(key)) + key.encode()
+        if value is not None:
+            if isinstance(value, str):
+                ret = ret + struct.pack("I", len(value)) + value.encode()
+            elif isinstance(value, int):
+                ret = ret + struct.pack("<l", value)
+            else:
+                ret = ret + struct.pack("<d", value)
+        bina = bina + ret
+
+    return bina
 
 
 def iar_to_fil_header(iar, encode: bool = False) -> bytes:
@@ -173,19 +169,8 @@ def iar_to_fil_header(iar, encode: bool = False) -> bytes:
     if not encode:
         return head
     head = fixed_header_start_end(head)
+
     return _encode_header(head)
-
-
-def _bins_to_filterbank(
-    bin_raw: bytes,
-    bin_header_dict: bytes,
-    outfile: os.PathLike,
-    overwrite: bool = False,
-) -> None:
-    """Documentation."""
-    write_to_file(outfile, bin_header_dict, "wb", overwrite)
-    write_to_file(outfile, bin_raw, "ab")
-    return
 
 
 def _binraw_to_filterbank(
@@ -204,7 +189,7 @@ def _binraw_to_filterbank(
         if name is None:
             raise OSError("Could not resolve/infer output file name.")
         else:
-            outfile = name + ".fil"
+            outfile = name
             filen = outfile
     elif is_filelike(outfile):
         filen = get_file_attr(outfile, "name")
@@ -218,7 +203,9 @@ def _binraw_to_filterbank(
         )
     headerdict = fixed_header_start_end(headerdict)
     bin_header = _encode_header(headerdict)
-    _bins_to_filterbank(bin_raw, bin_header, outfile, overwrite)
+    write_to_file(outfile, bin_header, "wb", overwrite)
+    write_to_file(outfile, bin_raw, "ab")
+
     return
 
 
@@ -229,8 +216,9 @@ def raw_to_filterbank(
     overwrite: bool = False,
 ) -> None:
     """Generate .fil file from header dict and raw data file."""
-    bin_raw = _read_raw(rawfile)
+    bin_raw = read_file(rawfile, "rb")
     _binraw_to_filterbank(bin_raw, header, outfile, overwrite)
+
     return
 
 
@@ -245,4 +233,5 @@ def df_to_filterbank(
     """Generate .fil file from dataframe and header dict."""
     bin_raw = data_to_bytes(df, fmt, order)
     _binraw_to_filterbank(bin_raw, header, outfile, overwrite)
+
     return

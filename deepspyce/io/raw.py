@@ -31,36 +31,6 @@ import pandas as pd
 # ============================================================================
 
 
-def _read_raw(rawfile: os.PathLike) -> bytes:
-    return read_file(rawfile, "rb")
-
-
-def _bin_raw_to_arr(
-    bin_raw: bytes,
-    n_channels: int = 2048,
-    fmt: np.dtype = ">i8",
-    order: str = "F",
-) -> np.ndarray:
-    """Convert binary raw data to numpy array."""
-    dt = np.dtype(fmt)
-    np_data = np.frombuffer(bin_raw, dtype=dt)
-    bytes_per_data = dt.alignment
-    total_bytes = len(bin_raw)
-    n_records = int(total_bytes / n_channels / bytes_per_data)
-    np_data = np_data.reshape(n_channels, n_records, order=order)
-    return np_data
-
-
-def _bin_raw_to_df(
-    bin_raw: bytes,
-    n_channels: int = 2048,
-    fmt: np.dtype = ">i8",
-    order: str = "F",
-) -> pd.DataFrame:
-    """Convert binary raw data to dataframe."""
-    return pd.DataFrame(_bin_raw_to_arr(bin_raw, n_channels, fmt, order))
-
-
 def raw_to_df(
     rawfile: os.PathLike,
     n_channels: int = 2048,
@@ -68,5 +38,12 @@ def raw_to_df(
     order: str = "F",
 ) -> pd.DataFrame:
     """Read a binary raw data file, and returns a dataframe."""
-    raw = _read_raw(rawfile)
-    return _bin_raw_to_df(raw, n_channels, fmt, order)
+    bin_raw = read_file(rawfile, "rb")
+    dt = np.dtype(fmt)
+    np_data = np.frombuffer(bin_raw, dtype=dt)
+    bytes_per_data = dt.alignment
+    total_bytes = len(bin_raw)
+    n_records = int(total_bytes / n_channels / bytes_per_data)
+    np_data = np_data.reshape(n_channels, n_records, order=order)
+
+    return pd.DataFrame(np_data)

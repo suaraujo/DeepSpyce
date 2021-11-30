@@ -28,6 +28,7 @@ import pytest
 def test_load_csv():
     """Test for loading csv_test file."""
     result = datasets.load_csv_test()
+
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (2048, 2)
     np.testing.assert_almost_equal(result[0].mean(), 16174.182128, 6)
