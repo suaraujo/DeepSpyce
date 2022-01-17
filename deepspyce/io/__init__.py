@@ -11,7 +11,7 @@
 # DOCS
 # ============================================================================
 
-"""Module DeepSpyce.io provides input/output tools."""
+"""The deepspyce.io module provides input/output tools."""
 
 # =============================================================================
 # IMPORTS
