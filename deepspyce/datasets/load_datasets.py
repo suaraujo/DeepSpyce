@@ -12,7 +12,7 @@
 # DOCS
 # =============================================================================
 
-"""Includes the functions to load provided datasets."""
+"""Module with functions to load provided datasets."""
 
 # ============================================================================
 # IMPORTS
@@ -67,7 +67,7 @@ def load_csv_test() -> pd.DataFrame:
     return pd.read_csv(path, dtype=">i8", header=None)
 
 
-def load_iar():
+def load_iar() -> dict:
     """Load template .iar file."""
     path = PATH / "J0437-4715_1_A1.iar"
 

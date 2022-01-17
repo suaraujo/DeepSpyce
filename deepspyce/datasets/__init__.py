@@ -12,7 +12,7 @@
 # DOCS
 # =============================================================================
 
-"""The deepspyce.datasets module includes utilities to load"+\
+"""The deepspyce.datasets module includes functions to load"+\
     " provided datasets."""
 
 # ============================================================================
