@@ -11,4 +11,4 @@
 # DOCS
 # ============================================================================
 
-"""Utilities module."""
+"""The deepspyce.utils module includes utilities functions."""
