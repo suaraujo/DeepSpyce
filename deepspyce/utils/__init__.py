@@ -11,18 +11,4 @@
 # DOCS
 # ============================================================================
 
-"""
-DeepSpyce.
-
-DeepSpyce is a module focused on the manipulation of raw data into
-other formats of interest for radio astronomy purpouses.
-
-"""
-
-__version__ = "0.0.1"
-
-# =============================================================================
-# IMPORTS
-# =============================================================================
-
-from . import io  # noqa
+"""The deepspyce.utils module includes utilities functions."""

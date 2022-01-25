@@ -28,6 +28,7 @@ import pytest
 def test_load_csv():
     """Test for loading csv_test file."""
     result = datasets.load_csv_test()
+
     assert isinstance(result, pd.DataFrame)
     assert result.shape == (2048, 2)
     np.testing.assert_almost_equal(result[0].mean(), 16174.182128, 6)
@@ -63,7 +64,7 @@ def test_load_raw_df():
 
 
 def test_load_raw_1m_df():
-    """Test for the size of the raw_test file."""
+    """Test for opening raw_test_1m file as DataFrame."""
     result = datasets.load_raw_1m()
 
     assert isinstance(result, pd.DataFrame)
@@ -74,10 +75,13 @@ def test_load_raw_1m_df():
 
 
 def test_load_iar():
-    """Test for the size of the raw_test file."""
+    """Test for opening test iar file."""
     result = datasets.load_iar()
 
-    assert isinstance(result, str)
-    assert len(result) == 370
-    assert len(result.splitlines()) == 16
-    assert len([letter for letter in result if letter.isupper()]) == 46
+    assert isinstance(result, dict)
+    assert len(result) == 16
+    assert result["Source Name"] == "J0437-4715_1_A1"
+    assert result["Reference DM"] == 2.64476
+    np.testing.assert_allclose(
+        [type(v) == float for v in list(result.values())[1:]], True
+    )
